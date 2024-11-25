@@ -1,13 +1,14 @@
 import json
 
 import httpx
+from sqlmodel import Session
 
 from db.models.school import School
 from db.models.request_data import RequestData
 
 
 async def save_schools_from_location(
-    number_of_pages: int, request_data: RequestData, session
+    number_of_pages: int, request_data: RequestData, session: Session
 ):
     request_dict = request_data.model_dump()
     request_dict["dot-amount"] = request_dict.pop("dot_amount")
@@ -22,7 +23,7 @@ def get_url_for_page(page: int) -> str:
     return base_url if page == 0 else f"{base_url}/{page}"
 
 
-async def get_schools_from_page(page: int, request_data: dict, session):
+async def get_schools_from_page(page: int, request_data: dict, session: Session):
     url = get_url_for_page(page=page)
     async with httpx.AsyncClient() as client:
         response = await client.post(url, data=request_data)
@@ -41,7 +42,7 @@ async def get_schools_from_page(page: int, request_data: dict, session):
     save_schools(schools=schools, session=session)
 
 
-def save_schools(schools: list, session):
+def save_schools(schools: list, session: Session):
     print(f"Saving {len(schools)} schools")
     for school_data in schools:
         school = School(**school_data)
@@ -52,7 +53,7 @@ def save_schools(schools: list, session):
             continue
 
 
-def save_school_data(school: School, session):
+def save_school_data(school: School, session: Session):
     session.add(school)
     session.commit()
     session.refresh(school)

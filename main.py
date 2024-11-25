@@ -1,12 +1,10 @@
-from typing import Annotated
-
-from sqlmodel import SQLModel, Session
-from fastapi import Depends, FastAPI, HTTPException, BackgroundTasks
+from sqlmodel import SQLModel
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 
 from db.models.school import School
 from db.models.request_data import RequestData
 from repository.schools import save_schools_from_location
-from db.session import engine, get_session
+from db.session import engine, SessionDep
 
 
 def create_db_and_tables():
@@ -18,8 +16,6 @@ def create_app():
     create_db_and_tables()
     return app
 
-
-SessionDep = Annotated[Session, Depends(get_session)]
 
 app = create_app()
 
